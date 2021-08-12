@@ -1,11 +1,13 @@
 const gameSettings = {
-    playerSpeed: 200
+    playerVelocity: 200,
+    powerUpsVelocity: 50,
+    shadowOffset: 3
 }
 
 const config = {
-    width: 600,
-    height: 600,
-    scene: Game,
+    width: 800,
+    height: 800,
+    scene: [Loading, Game, GameOver],
     pixelArt: true,
     physics: {
         default: 'arcade',

@@ -1,18 +1,6 @@
 class Game extends Phaser.Scene {
     constructor() {
-        super("SpaceDestroyer");
-    }
-
-    preload() {
-        this.load.image("background", "assets/images/background.png");
-        this.load.spritesheet("ship1", "assets/spritesheets/ship1.png", {frameWidth: 16, frameHeight: 16});
-        this.load.spritesheet("ship2", "assets/spritesheets/ship2.png", {frameWidth: 32, frameHeight: 16});
-        this.load.spritesheet("ship3", "assets/spritesheets/ship3.png", {frameWidth: 32, frameHeight: 32});
-        this.load.spritesheet("explosion", "assets/spritesheets/explosion.png", {frameWidth: 16, frameHeight: 16});
-        this.load.spritesheet("powerUp", "assets/spritesheets/powerUp.png", {frameWidth: 16, frameHeight: 16});
-        this.load.spritesheet("player", "assets/spritesheets/player.png", {frameWidth: 16, frameHeight: 24});
-        this.load.spritesheet("beam", "assets/spritesheets/beam.png", {frameWidth: 16, frameHeight: 16});
-        this.load.bitmapFont("pixelFont", "assets/font/font.png", "assets/font/font.xml");
+        super("Game");
     }
 
     create() {
@@ -20,73 +8,12 @@ class Game extends Phaser.Scene {
         this.background.setOrigin(0, 0);
 
         this.ship1 = this.add.sprite(config.width / 2 - 50, config.height / 2, "ship1");
-        this.ship1.setScale(2);
-        this.anims.create({
-            key: "ship1_anim",
-            frames: this.anims.generateFrameNumbers("ship1"),
-            frameRate: 20,
-            repeat: -1
-        });
-
         this.ship2 = this.add.sprite(config.width / 2, config.height / 2, "ship2");
-        this.ship2.setScale(2);
-        this.anims.create({
-            key: "ship2_anim",
-            frames: this.anims.generateFrameNumbers("ship2"),
-            frameRate: 20,
-            repeat: -1
-        });
-
         this.ship3 = this.add.sprite(config.width / 2 + 50, config.height / 2, "ship3");
-        this.ship3.setScale(2);
-        this.anims.create({
-            key: "ship3_anim",
-            frames: this.anims.generateFrameNumbers("ship3"),
-            frameRate: 20,
-            repeat: -1
-        });
 
-        this.anims.create({
-            key: "explosion",
-            frames: this.anims.generateFrameNumbers("explosion"),
-            frameRate: 20,
-            repeat: 0,
-            hideOnComplete: true
-        });
-
-        this.anims.create({
-            key: "red",
-            frames: this.anims.generateFrameNumbers("powerUp", {
-                start: 0,
-                end: 1
-            }),
-            frameRate: 20,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "gray",
-            frames: this.anims.generateFrameNumbers("powerUp", {
-                start: 2,
-                end: 3
-            }),
-            frameRate: 20,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "player",
-            frames: this.anims.generateFrameNumbers("player"),
-            frameRate: 20,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "beam",
-            frames: this.anims.generateFrameNumbers("beam"),
-            frameRate: 20,
-            repeat: -1
-        });
+        this.ship1.play("ship1_anim");
+        this.ship2.play("ship2_anim");
+        this.ship3.play("ship3_anim");
 
         this.powerUps = this.physics.add.group();
         const maxPowerUps = 4;
@@ -101,28 +28,24 @@ class Game extends Phaser.Scene {
                 powerUp.play("gray");
             }
 
-            powerUp.setVelocity(Phaser.Math.Between(-50, 50), 50);
+            powerUp.setVelocity(Phaser.Math.Between(
+                -gameSettings.powerUpsVelocity,
+                gameSettings.powerUpsVelocity
+            ), gameSettings.powerUpsVelocity);
             powerUp.setCollideWorldBounds(true);
             powerUp.setBounce(1);
         }
 
-        this.ship1.play("ship1_anim");
-        this.ship2.play("ship2_anim");
-        this.ship3.play("ship3_anim");
-
-        this.ship1.setInteractive();
-        this.ship2.setInteractive();
-        this.ship3.setInteractive();
-
-        this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 64, "player");
+        this.player = this.physics.add.sprite(config.width / 2 - 8, config.height - 64, "plane");
         this.player.setCollideWorldBounds(true);
+        this.player.play("plane");
+        this.player.setDepth(2);
 
         this.cursorKeys = this.input.keyboard.createCursorKeys();
         this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.beams = this.add.group();
-
-        this.input.on('gameobjectdown', this.destroyShip, this);
+        this.scaleFactor = 1;
 
         this.physics.add.overlap(this.player, this.powerUps, this.pickPowerUp, null, this);
 
@@ -155,6 +78,7 @@ class Game extends Phaser.Scene {
         this.moveShip(this.ship3, 3);
         this.background.tilePositionY -= 0.5;
         this.movePlayerManager();
+
         if (Phaser.Input.Keyboard.JustDown(this.spacebar)) {
             if (this.player.active) {
                 this.shootBeam();
@@ -183,49 +107,51 @@ class Game extends Phaser.Scene {
         powerUp.x = Phaser.Math.Between(10, config.width - 10);
     }
 
-    destroyShip(pointer, gameObject) {
-        gameObject.setTexture("explosion");
-        gameObject.play("explosion");
-    }
-
     movePlayerManager() {
         this.player.setVelocity(0, 0);
 
         if (this.cursorKeys.left.isDown) {
-            this.player.setVelocityX(-gameSettings.playerSpeed);
+            this.player.setVelocityX(-gameSettings.playerVelocity);
         } else if (this.cursorKeys.right.isDown) {
-            this.player.setVelocityX(gameSettings.playerSpeed);
+            this.player.setVelocityX(gameSettings.playerVelocity);
         }
 
         if (this.cursorKeys.up.isDown) {
-            this.player.setVelocityY(-gameSettings.playerSpeed);
+            this.player.setVelocityY(-gameSettings.playerVelocity);
         } else if (this.cursorKeys.down.isDown) {
-            this.player.setVelocityY(gameSettings.playerSpeed);
+            this.player.setVelocityY(gameSettings.playerVelocity);
         }
     }
 
     shootBeam() {
-        let beam = new Beam(this);
-    }
-
-    beamHitsPowerUp(beam, powerUp) {
-        beam.destroy();
+        let beam = new Beam(this, this.scaleFactor || 1);
     }
 
     pickPowerUp(player, powerUp) {
         this.resetPowerUp(powerUp);
+        this.score += 5;
+        const scoreFormatted = this.zeroPad(this.score, 6);
+        this.scoreLabel.text = "SCORE " + scoreFormatted;
     }
 
     hurtPlayer(player, enemy) {
         if (player.alpha == 1) {
             this.resetShipPosition(enemy);
+            this.scaleFactor = 1;
+            this.scoreToRemember = this.score;
+            this.score = this.score < 100 ? 0 : this.score - 100;
+            const scoreFormatted = this.zeroPad(this.score, 6);
+            this.scoreLabel.text = "SCORE " + scoreFormatted;
             let explosion = new Explosion(this, player.x, player.y);
             player.disableBody(true, true);
-            this.time.addEvent({
-                delay: 1000,
-                callback: this.resetPlayer,
-                callbackScope: this,
-                loop: false
+            // this.time.addEvent({
+            //     delay: 1000,
+            //     callback: this.resetPlayer,
+            //     callbackScope: this,
+            //     loop: false
+            // });
+            this.scene.start("GameOver", {
+                score: this.scoreToRemember
             });
         }
     }
@@ -239,21 +165,14 @@ class Game extends Phaser.Scene {
         this.scoreLabel.text = "SCORE " + scoreFormatted;
     }
 
-    zeroPad(number, size) {
-        let stringNumber = String(number);
-        while (stringNumber.length < (size || 2)) {
-            stringNumber = "0" + stringNumber;
-        }
-        return stringNumber;
-    }
-
     resetPlayer() {
         const x = config.width / 2 - 8;
         const y = config.height + 64;
         this.player.enableBody(true, x, y, true, true);
+        this.player.setDepth(2);
         this.player.alpha = 0.5;
 
-        let tween = this.tweens.add({
+        this.tweens.add({
             targets: this.player,
             y: config.height - 64,
             ease: 'Power1',
@@ -264,5 +183,13 @@ class Game extends Phaser.Scene {
             },
             callbackScope: this
         })
+    }
+
+    zeroPad(number, size) {
+        let stringNumber = String(number);
+        while (stringNumber.length < (size || 2)) {
+            stringNumber = "0" + stringNumber;
+        }
+        return stringNumber;
     }
 }
