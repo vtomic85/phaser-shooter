@@ -59,6 +59,8 @@ class Game extends Phaser.Scene {
         this.physics.add.overlap(this.beams, this.enemies, this.hitEnemy, null, this);
 
         this.score = 0;
+        this.lives = 3;
+
         let graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 1);
         graphics.beginPath();
@@ -69,7 +71,9 @@ class Game extends Phaser.Scene {
         graphics.lineTo(0, 0);
         graphics.closePath();
         graphics.fillPath();
-        this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE 0", 16);
+        const scoreFormatted = this.zeroPad(this.score, 6);
+        this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE " + scoreFormatted, 16);
+        this.livesLabel = this.add.bitmapText(config.width - 100, 5, "pixelFont", "LIVES 3");
     }
 
     update() {
@@ -144,15 +148,22 @@ class Game extends Phaser.Scene {
             this.scoreLabel.text = "SCORE " + scoreFormatted;
             let explosion = new Explosion(this, player.x, player.y);
             player.disableBody(true, true);
-            // this.time.addEvent({
-            //     delay: 1000,
-            //     callback: this.resetPlayer,
-            //     callbackScope: this,
-            //     loop: false
-            // });
-            this.scene.start("GameOver", {
-                score: this.scoreToRemember
-            });
+            this.lives--;
+            this.livesLabel.setText("LIVES " + this.lives);
+            if (this.lives > 0) {
+                this.time.addEvent({
+                    delay: 1000,
+                    callback: this.resetPlayer,
+                    callbackScope: this,
+                    loop: false
+                });
+            } else {
+                setTimeout(() => {
+                    this.scene.start("GameOver", {
+                        score: this.scoreToRemember
+                    });
+                }, 1000);
+            }
         }
     }
 

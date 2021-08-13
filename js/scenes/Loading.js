@@ -4,7 +4,7 @@ class Loading extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("background", "assets/images/background.png");
+        this.load.image("background", "assets/images/bg.png");
         this.load.spritesheet("ship1", "assets/spritesheets/ship1.png", {frameWidth: 16, frameHeight: 16});
         this.load.spritesheet("ship2", "assets/spritesheets/ship2.png", {frameWidth: 32, frameHeight: 16});
         this.load.spritesheet("ship3", "assets/spritesheets/ship3.png", {frameWidth: 32, frameHeight: 32});
@@ -17,7 +17,11 @@ class Loading extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(20, 20, "Loading...");
+        this.add.text(config.width / 2, config.height - 20, "Loading...").setOrigin(0.5);
+        this.add.text(config.width / 2, config.height / 2, "SPACE SHOOTER", {
+            fontSize: '48px',
+            fill: '#FF0'
+        }).setOrigin(0.5);
 
         this.anims.create({
             key: "ship1_anim",
@@ -89,6 +93,8 @@ class Loading extends Phaser.Scene {
             repeat: -1
         });
 
-        this.scene.start("Game");
+        setTimeout(() => {
+            this.scene.start("Game");
+        }, 2000);
     }
 }

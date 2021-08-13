@@ -5,7 +5,7 @@ const gameSettings = {
 }
 
 const config = {
-    width: 800,
+    width: 1000,
     height: 800,
     scene: [Loading, Game, GameOver],
     pixelArt: true,
