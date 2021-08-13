@@ -132,18 +132,28 @@ class Game extends Phaser.Scene {
     }
 
     pickPowerUp(player, powerUp) {
+        let scoreIncrementText = this.add.text(powerUp.x, powerUp.y, "+" + gameSettings.powerUpPickedScoreIncrement, {
+            font: 'bold',
+            fill: '#FF0'
+        });
+        setTimeout(() => scoreIncrementText.destroy(), 2000);
         this.resetPowerUp(powerUp);
-        this.score += 5;
+        this.score += gameSettings.powerUpPickedScoreIncrement;
         const scoreFormatted = this.zeroPad(this.score, 6);
         this.scoreLabel.text = "SCORE " + scoreFormatted;
     }
 
     hurtPlayer(player, enemy) {
         if (player.alpha == 1) {
+            let scoreDecrementText = this.add.text(player.x, player.y, this.score >= 100 ? ("-" + gameSettings.deathScoreDecrement) : ("-" + this.score), {
+                font: 'bold',
+                fill: '#F00'
+            });
+            setTimeout(() => scoreDecrementText.destroy(), 2000);
             this.resetShipPosition(enemy);
             this.scaleFactor = 1;
             this.scoreToRemember = this.score;
-            this.score = this.score < 100 ? 0 : this.score - 100;
+            this.score = this.score < gameSettings.deathScoreDecrement ? 0 : this.score - gameSettings.deathScoreDecrement;
             const scoreFormatted = this.zeroPad(this.score, 6);
             this.scoreLabel.text = "SCORE " + scoreFormatted;
             let explosion = new Explosion(this, player.x, player.y);
@@ -169,9 +179,14 @@ class Game extends Phaser.Scene {
 
     hitEnemy(beam, enemy) {
         let explosion = new Explosion(this, enemy.x, enemy.y);
+        let scoreIncrementText = this.add.text(enemy.x, enemy.y, "+" + gameSettings.enemyHitScoreIncrement, {
+            font: 'bold',
+            fill: '#FF0'
+        });
+        setTimeout(() => scoreIncrementText.destroy(), 2000);
         beam.destroy();
         this.resetShipPosition(enemy);
-        this.score += 10;
+        this.score += gameSettings.enemyHitScoreIncrement;
         const scoreFormatted = this.zeroPad(this.score, 6);
         this.scoreLabel.text = "SCORE " + scoreFormatted;
     }

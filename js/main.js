@@ -1,7 +1,10 @@
 const gameSettings = {
     playerVelocity: 200,
     powerUpsVelocity: 50,
-    shadowOffset: 3
+    shadowOffset: 3,
+    enemyHitScoreIncrement: 10,
+    powerUpPickedScoreIncrement: 1,
+    deathScoreDecrement: 100
 }
 
 const config = {
