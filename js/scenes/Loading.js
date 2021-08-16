@@ -9,7 +9,7 @@ class Loading extends Phaser.Scene {
         this.load.spritesheet("ship2", "assets/spritesheets/ship2.png", {frameWidth: 32, frameHeight: 16});
         this.load.spritesheet("ship3", "assets/spritesheets/ship3.png", {frameWidth: 32, frameHeight: 32});
         this.load.spritesheet("explosion", "assets/spritesheets/explosion.png", {frameWidth: 16, frameHeight: 16});
-        this.load.spritesheet("powerUp", "assets/spritesheets/powerUp.png", {frameWidth: 16, frameHeight: 16});
+        this.load.spritesheet("powerUp", "assets/spritesheets/powerUp2.png", {frameWidth: 16, frameHeight: 16});
         this.load.spritesheet("player", "assets/spritesheets/player.png", {frameWidth: 16, frameHeight: 24});
         this.load.spritesheet("plane", "assets/spritesheets/plane.png", {frameWidth: 32, frameHeight: 32});
         this.load.spritesheet("beam", "assets/spritesheets/beam.png", {frameWidth: 16, frameHeight: 16});
@@ -53,22 +53,22 @@ class Loading extends Phaser.Scene {
         });
 
         this.anims.create({
-            key: "red",
+            key: "points",
             frames: this.anims.generateFrameNumbers("powerUp", {
                 start: 0,
                 end: 1
             }),
-            frameRate: 20,
+            frameRate: 5,
             repeat: -1
         });
 
         this.anims.create({
-            key: "gray",
+            key: "life",
             frames: this.anims.generateFrameNumbers("powerUp", {
                 start: 2,
                 end: 3
             }),
-            frameRate: 20,
+            frameRate: 5,
             repeat: -1
         });
 

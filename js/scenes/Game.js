@@ -16,16 +16,17 @@ class Game extends Phaser.Scene {
         this.ship3.play("ship3_anim");
 
         this.powerUps = this.physics.add.group();
-        const maxPowerUps = 4;
-        for (let i = 0; i < maxPowerUps; i++) {
+        for (let i = 0; i < gameSettings.maxPowerUps; i++) {
             let powerUp = this.physics.add.sprite(16, 16, "powerUp");
             this.powerUps.add(powerUp);
             powerUp.setRandomPosition(0, 0, game.config.width, game.config.height);
 
             if (Math.random() > 0.5) {
-                powerUp.play("red");
+                powerUp.type = "points";
+                powerUp.play("points");
             } else {
-                powerUp.play("gray");
+                powerUp.type = "life";
+                powerUp.play("life");
             }
 
             powerUp.setVelocity(Phaser.Math.Between(
@@ -107,6 +108,13 @@ class Game extends Phaser.Scene {
     }
 
     resetPowerUp(powerUp) {
+        if (Math.random() > 0.5) {
+            powerUp.type = "points";
+            powerUp.play("points");
+        } else {
+            powerUp.type = "life";
+            powerUp.play("life");
+        }
         powerUp.y = 0;
         powerUp.x = Phaser.Math.Between(10, config.width - 10);
     }
@@ -132,15 +140,25 @@ class Game extends Phaser.Scene {
     }
 
     pickPowerUp(player, powerUp) {
-        let scoreIncrementText = this.add.text(powerUp.x, powerUp.y, "+" + gameSettings.powerUpPickedScoreIncrement, {
-            font: 'bold',
-            fill: '#FF0'
-        });
-        setTimeout(() => scoreIncrementText.destroy(), 2000);
+        if (powerUp.type === "points") {
+            let scoreIncrementText = this.add.text(powerUp.x, powerUp.y, "+" + gameSettings.powerUpPickedScoreIncrement, {
+                font: 'bold',
+                fill: '#FF0'
+            });
+            setTimeout(() => scoreIncrementText.destroy(), 2000);
+            this.score += gameSettings.powerUpPickedScoreIncrement;
+            const scoreFormatted = this.zeroPad(this.score, 6);
+            this.scoreLabel.text = "SCORE " + scoreFormatted;
+        } else {
+            let lifeIncrementText = this.add.text(powerUp.x, powerUp.y, "1 UP", {
+                font: 'bold',
+                fill: '#0F0'
+            });
+            setTimeout(() => lifeIncrementText.destroy(), 2000);
+            this.lives++;
+            this.livesLabel.setText("LIVES " + this.lives);
+        }
         this.resetPowerUp(powerUp);
-        this.score += gameSettings.powerUpPickedScoreIncrement;
-        const scoreFormatted = this.zeroPad(this.score, 6);
-        this.scoreLabel.text = "SCORE " + scoreFormatted;
     }
 
     hurtPlayer(player, enemy) {
